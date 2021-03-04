@@ -16,14 +16,14 @@ public class UsuarioDaoTest {
     private EntityManager em;
 
     @Before
-    public void beforeEach() {
+    public void before() {
         this.em = JPAUtil.getEntityManager();
         this.dao = new UsuarioDao(em);
         em.getTransaction().begin();
     }
 
     @After
-    public void afterEach(){
+    public void after(){
         em.getTransaction().rollback();
     }
 
