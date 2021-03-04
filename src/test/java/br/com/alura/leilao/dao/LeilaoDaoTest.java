@@ -1,9 +1,10 @@
 package br.com.alura.leilao.dao;
 
+import br.com.alura.leilao.util.builder.LeilaoBuilder;
 import br.com.alura.leilao.model.Leilao;
 import br.com.alura.leilao.model.Usuario;
 import br.com.alura.leilao.util.JPAUtil;
-import org.junit.Assert;
+import br.com.alura.leilao.util.builder.UsuarioBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,29 +32,45 @@ public class LeilaoDaoTest {
         em.getTransaction().rollback();
     }
 
-    private Usuario criarUsuario() {
-        Usuario usuario = new Usuario("fulano", "fulano@email.com", "12345");
-        em.persist(usuario);
-        return usuario;
-    }
-
     @Test
     void deveriaCadastrarUmLeilao() {
-        Usuario usuario = criarUsuario();
-        Leilao leilao = new Leilao("Mochila", new BigDecimal("70"),
-                LocalDate.now(), usuario);
+        Usuario usuario = new UsuarioBuilder()
+                .comNome("Fulano")
+                .comEmail("fulano@email.com")
+                .comSenha("123456")
+                .criar();
+
+        em.persist(usuario);
+
+        Leilao leilao = new LeilaoBuilder()
+                .comNome("Mochila")
+                .comValorInicial("500")
+                .comData(LocalDate.now())
+                .comUsuario(usuario)
+                .criar();
 
         leilao = dao.salvar(leilao);
 
         Leilao salvo = dao.buscarPorId(leilao.getId());
-        Assert.assertNotNull(salvo);
+        Assertions.assertNotNull(salvo);
     }
 
     @Test
     void deveriaAtualizarUmLeilao() {
-        Usuario usuario = criarUsuario();
-        Leilao leilao = new Leilao("Mochila", new BigDecimal("70"),
-                LocalDate.now(), usuario);
+        Usuario usuario = new UsuarioBuilder()
+                .comNome("Fulano")
+                .comEmail("fulano@email.com")
+                .comSenha("123456")
+                .criar();
+
+        em.persist(usuario);
+
+        Leilao leilao = new LeilaoBuilder()
+                .comNome("Mochila")
+                .comValorInicial("500")
+                .comData(LocalDate.now())
+                .comUsuario(usuario)
+                .criar();
 
         leilao = dao.salvar(leilao);
 
@@ -64,6 +81,6 @@ public class LeilaoDaoTest {
 
         Leilao salvo = dao.buscarPorId(leilao.getId());
         Assertions.assertEquals("Celular", salvo.getNome());
-        Assert.assertEquals(new BigDecimal("400"), salvo.getValorInicial());
+        Assertions.assertEquals(new BigDecimal("400"), salvo.getValorInicial());
     }
 }
